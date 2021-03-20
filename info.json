@@ -1,0 +1,8 @@
+{
+  "author" : ["wysc.us.to"],
+  "install_msg" : "Hi, thanks for adding wysc-cogs! The cogs built here have been specifically developed for Wysc. See https://wysc.us.to/ for more info about us!",
+  "name" : "wysc-cogs",
+  "short" : "Cogs for Wysc",
+  "description" : " Feature plugins for Wysc Staff Discord Bot",
+  "tags" : []
+}
