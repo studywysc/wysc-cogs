@@ -95,12 +95,12 @@ class wroles(commands.Cog):
         await self.addToApprovedRoles(ctx, roleName)
         await ctx.message.add_reaction("✅")
         
-    @treeroles.command(name="remove")
-    @checks.admin()
-    async def treerolesremove(self, ctx, *, roleName: discord.Role):
-        """Adds an existing role to the list of Event Roles."""
-        await self.addToApprovedRoles(ctx, roleName)
-        await ctx.message.add_reaction("✅")
+    # @treeroles.command(name="remove")
+    # @checks.admin()
+    # async def treerolesremove(self, ctx, *, roleName: discord.Role):
+    #     """Removes an existing role to the list of Event Roles."""
+    #     await self.addToApprovedRoles(ctx, roleName)
+    #     await ctx.message.add_reaction("✅")
         
     @treeroles.command(name="enable")
     @checks.admin()
