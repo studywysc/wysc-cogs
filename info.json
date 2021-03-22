@@ -4,5 +4,5 @@
   "name" : "wysc-cogs",
   "short" : "Cogs for Wysc",
   "description" : " Feature plugins for Wysc Staff Discord Bot",
-  "tags" : []
+  "tags" : ["wysc"]
 }
