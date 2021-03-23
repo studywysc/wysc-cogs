@@ -98,11 +98,12 @@ class wroles(commands.Cog):
 
     # Bot Commands
 
-    @commands.command(name="roles", aliases=["iam"])
+    @commands.command(name="roles", aliases=["iam", "am"])
     async def wroles(self, ctx, *, role: discord.Role=None):
         """List self-assignable Event Roles
         
         Add roles using `[p]roles roleYouWantToAddHere`"""
+        # [TODO] Look for way to search for discord role without needing Exact Caps including emoji just to get the role
 
         # Get roles, then make crList which only has the role id's
         currentRoles = await self.config.guild(ctx.guild).roleList()
@@ -115,6 +116,7 @@ class wroles(commands.Cog):
             for a in currentRoles:
                 b = self.roledataMention(a)
                 embedList += b+"\n"
+            # [TODO] Add title to embed, and a footer that says you can add roles using ",wam"
             e = discord.Embed(color=(await ctx.embed_colour()), description=embedList)
             await ctx.send(embed=e)
         else:
@@ -122,11 +124,17 @@ class wroles(commands.Cog):
             # We build crList with a list of role id's
             crList = [self.roledataId(r) for r in currentRoles]
             # If there's a match, we .add_role to them
-            if role.id in crList:
-                await ctx.author.add_roles(role)
-                await ctx.message.add_reaction("✅")
-            else:
+            try:
+                b = role.id
+            except:
                 await ctx.send("Hmmm did you misspell the role? Try just ,wroles to see the roles you can add!")
+            else:
+                if b in crList:
+                    # [TODO] Add a way for it to remove role if you already have it
+                    await ctx.author.add_roles(role)
+                    await ctx.message.add_reaction("✅")
+                else:
+                    await ctx.send("Hmmm did you misspell the role? Try just ,wroles to see the roles you can add!")
     
     @commands.guild_only()
     @commands.group()
