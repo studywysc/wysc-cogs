@@ -43,19 +43,42 @@ class wroles(commands.Cog):
 
     # Utility Commands
 
+    def roledataName(self, arrayitem):
+        return arrayitem[0]
+
+    def roledataMention(self, arrayitem):
+        return arrayitem[1]
+
+    def roledataId(self, arrayitem):
+        return arrayitem[2]
+
     async def addToRoleList(self, ctx, roleName: discord.Role):
         """Add a role to the list of roles"""
+        await self.updateRoleList(ctx) # Make sure the name of current roles are updated first
         currentRoles = await self.config.guild(ctx.guild).roleList()
-        currentRoles.append(roleName)
+        currentRoles.append([roleName.name, roleName.mention, roleName.id])
+        currentRoles.sort(key=self.roledataName)
         await self.config.guild(ctx.guild).roleList.set(currentRoles)
-        return True
+        # return True
 
     async def removeFromRoleList(self, ctx, roleName: discord.Role):
         """Remove a role from the list of roles"""
+        await self.updateRoleList(ctx) # Make sure the name of current roles are updated first
         currentRoles = await self.config.guild(ctx.guild).roleList()
-        currentRoles.remove(roleName)
+        currentRoles.remove([roleName.name, roleName.mention, roleName.id])
         await self.config.guild(ctx.guild).roleList.set(currentRoles)
-        return True
+        # return True
+        
+    async def updateRoleList(self, ctx):
+        """Updates the role names in the database"""
+        currentRoles = await self.config.guild(ctx.guild).roleList()
+        sortRoles = []
+        for a in currentRoles:
+            b = ctx.guild.get_role(self.roledataId(a))
+            sortRoles.append([b.name, b.mention, b.id])
+        sortRoles.sort(key=self.roledataName)
+        await self.config.guild(ctx.guild).roleList.set(sortRoles)
+        await ctx.message.add_reaction("✅")
 
 
     # Bot Commands
@@ -65,14 +88,20 @@ class wroles(commands.Cog):
         """List self-assignable Event Roles
         
         Add roles using `[p]roles roleYouWantToAddHere`"""
+        currentRoles = await self.config.guild(ctx.guild).roleList()
         if role == None:
-            currentRoles = await self.config.guild(ctx.guild).roleList()
-            # [TODO] Create an embed of these roles, with @mentions
-            await ctx.send(currentRoles)
+            crList = ""
+            for a in currentRoles:
+                b = self.roledataMention(a)
+                crList += b+"\n"
+            e = discord.Embed(color=(await ctx.embed_colour()), description=crList)
+            await ctx.send(embed=e)
         else:
-            # [TODO] Add check for if role is in roleList
-            await ctx.author.add_roles(role)
-            await ctx.message.add_reaction("✅")
+            if role in currentRoles:
+                await ctx.author.add_roles(role)
+                await ctx.message.add_reaction("✅")
+            else:
+                await ctx.send("Hmmm did you misspell the role? Try just ,wroles to see the roles you can add!")
     
     @commands.guild_only()
     @commands.group()
@@ -98,6 +127,19 @@ class wroles(commands.Cog):
         role = await ctx.guild.create_role(name=roleName, mentionable=True)
         await self.addToRoleList(ctx, role)
         await ctx.send(f"{role.mention} is created and ready for use! Add it using `,wroles`")
+
+    @setroles.command(name="edit")
+    async def setrolesedit(self, ctx, *, roleName: discord.Role):
+        """Edit an Event Role"""
+        # [TODO] Add support for await self.wait_for(hex, check=x, timeout=10.0)
+
+    @setroles.command(name="update")
+    async def setrolesupdate(self, ctx, *, roleName: discord.Role):
+        """Updates the role names in the database."""
+        await self.updateRoleList(ctx)
+        await ctx.message.add_reaction("✅")
+
+    # Admin roles only    
         
     @setroles.command(name="add")
     @checks.admin()
@@ -111,6 +153,14 @@ class wroles(commands.Cog):
     async def setrolesremove(self, ctx, *, roleName: discord.Role):
         """Removes an existing role from the list of Event Roles."""
         await self.removeFromRoleList(ctx, roleName)
+        await ctx.message.add_reaction("✅")
+        
+    @setroles.command(name="reset")
+    @checks.admin()
+    async def setrolesreset(self, ctx):
+        """Reset all of a server's configurations."""
+        await self.config.guild(ctx.guild).roleList.set([])
+        await self.config.guild(ctx.guild).roleMsgs.set([])
         await ctx.message.add_reaction("✅")
         
     @setroles.command(name="enable")
@@ -128,8 +178,3 @@ class wroles(commands.Cog):
         """Make an Event Role unmentionable. Does not delete the role."""
         await roleName.edit(mentionable=False)
         await ctx.message.add_reaction("✅")
-
-    @setroles.command(name="edit")
-    async def setrolesedit(self, ctx, *, roleName: discord.Role):
-        """Edit an Event Role"""
-        # [TODO] Add support for await self.wait_for(hex, check=x, timeout=10.0)
