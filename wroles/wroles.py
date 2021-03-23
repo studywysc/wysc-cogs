@@ -43,6 +43,9 @@ class wroles(commands.Cog):
 
     # Utility Commands
 
+    def roledataItem(self, arrayitem):
+        return [arrayitem.name, arrayitem.mention, arrayitem.id]
+
     def roledataName(self, arrayitem):
         return arrayitem[0]
 
@@ -54,29 +57,41 @@ class wroles(commands.Cog):
 
     async def addToRoleList(self, ctx, roleName: discord.Role):
         """Add a role to the list of roles"""
-        await self.updateRoleList(ctx) # Make sure the name of current roles are updated first
+        # Make sure the name of current roles are updated first (to make sure the sort is correct)
+        await self.updateRoleList(ctx)
+        # Retrieve role info
         currentRoles = await self.config.guild(ctx.guild).roleList()
-        currentRoles.append([roleName.name, roleName.mention, roleName.id])
+        # Append a role item array
+        currentRoles.append(self.roledataItem(roleName))
+        # Sort the array alphabetically
         currentRoles.sort(key=self.roledataName)
+        # Commit the changes to guild data
         await self.config.guild(ctx.guild).roleList.set(currentRoles)
-        # return True
 
     async def removeFromRoleList(self, ctx, roleName: discord.Role):
         """Remove a role from the list of roles"""
-        await self.updateRoleList(ctx) # Make sure the name of current roles are updated first
+        # Make sure the name of current roles are updated first (otherwise the remove will fail)
+        await self.updateRoleList(ctx)
+        # Retrieve role info
         currentRoles = await self.config.guild(ctx.guild).roleList()
-        currentRoles.remove([roleName.name, roleName.mention, roleName.id])
+        # Remove a role item array
+        currentRoles.remove(self.roledataItem(roleName))
+        # Commit the changes to guild data
         await self.config.guild(ctx.guild).roleList.set(currentRoles)
-        # return True
         
     async def updateRoleList(self, ctx):
         """Updates the role names in the database"""
+        # Retrieve role info
         currentRoles = await self.config.guild(ctx.guild).roleList()
+        # For each existing item in currentRoles, get fresh data on all of them
+        # then append it to sortRoles
         sortRoles = []
         for a in currentRoles:
             b = ctx.guild.get_role(self.roledataId(a))
-            sortRoles.append([b.name, b.mention, b.id])
+            sortRoles.append(self.roledataItem(b))
+        # Sort the array of items by role name
         sortRoles.sort(key=self.roledataName)
+        # Commit the changes to guild data
         await self.config.guild(ctx.guild).roleList.set(sortRoles)
         await ctx.message.add_reaction("✅")
 
@@ -88,16 +103,26 @@ class wroles(commands.Cog):
         """List self-assignable Event Roles
         
         Add roles using `[p]roles roleYouWantToAddHere`"""
+
+        # Get roles, then make crList which only has the role id's
         currentRoles = await self.config.guild(ctx.guild).roleList()
+        
         if role == None:
-            crList = ""
+            # If there isn't a role specified, build an embed
+            # we get the mentions from each role by running roledataMention for each in currentRoles
+            # then we add them to a string with "\n" for newline
+            embedList = ""
             for a in currentRoles:
                 b = self.roledataMention(a)
                 crList += b+"\n"
-            e = discord.Embed(color=(await ctx.embed_colour()), description=crList)
+            e = discord.Embed(color=(await ctx.embed_colour()), description=embedList)
             await ctx.send(embed=e)
         else:
-            if role in currentRoles:
+            # If there is a role specified, role.id will give us its role id
+            # We build crList with a list of role id's
+            crList = [self.roledataId(r) for r in currentRoles]
+            # If there's a match, we .add_role to them
+            if role.id in crList:
                 await ctx.author.add_roles(role)
                 await ctx.message.add_reaction("✅")
             else:
@@ -128,10 +153,25 @@ class wroles(commands.Cog):
         await self.addToRoleList(ctx, role)
         await ctx.send(f"{role.mention} is created and ready for use! Add it using `,wroles`")
 
-    @setroles.command(name="edit")
-    async def setrolesedit(self, ctx, *, roleName: discord.Role):
-        """Edit an Event Role"""
-        # [TODO] Add support for await self.wait_for(hex, check=x, timeout=10.0)
+    @setroles.command(name="editname")
+    async def srename(self, ctx, roleName: discord.Role, *, newName):
+        """Edit Event Role name"""
+        try:
+            roleName.edit(name=newName)
+        except:
+            ctx.send("Oops, that didn't work... Maybe something was typed weird?")
+        else:
+            await ctx.message.add_reaction("✅")
+
+    @setroles.command(name="editcolor", aliases=["editcolour"])
+    async def srecolor(self, ctx, *, roleName: discord.Role, hexColor):
+        """Edit Event Role color/colour"""
+        try:
+            roleName.edit(colour=discord.Colour(int(f"0x{hexColor}", 16)))
+        except:
+            ctx.send("Oops, that didn't work... Maybe something was typed weird?")
+        else:
+            await ctx.message.add_reaction("✅")
 
     @setroles.command(name="update")
     async def setrolesupdate(self, ctx, *, roleName: discord.Role):
