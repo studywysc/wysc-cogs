@@ -114,7 +114,7 @@ class wroles(commands.Cog):
             embedList = ""
             for a in currentRoles:
                 b = self.roledataMention(a)
-                crList += b+"\n"
+                embedList += b+"\n"
             e = discord.Embed(color=(await ctx.embed_colour()), description=embedList)
             await ctx.send(embed=e)
         else:
