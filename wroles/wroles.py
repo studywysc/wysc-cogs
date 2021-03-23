@@ -144,11 +144,6 @@ class wroles(commands.Cog):
         
         Please make sure your event shows demonstrated interest first!
         Demonstrated interest can be pre-planned meetups of 5+ users, or at least 3 consecutive events, or some form of community benefit to having a pingable role."""
-        
-        # [TODO] Add support for await self.wait_for(hex, check=x, timeout=10.0)
-        #
-        # role = await ctx.guild.create_role(name=roleName, mentionable=True, colour = discord.Colour(int(f"0x{hexColor}", 16)))
-
         role = await ctx.guild.create_role(name=roleName, mentionable=True)
         await self.addToRoleList(ctx, role)
         await ctx.send(f"{role.mention} is created and ready for use! Add it using `,wroles`")
