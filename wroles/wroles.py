@@ -192,6 +192,12 @@ class wroles(commands.Cog):
             ctx.send("Oops, that didn't work... Maybe something was typed weird?")
         else:
             await ctx.message.add_reaction("✅")
+        
+    @setroles.command(name="remove")
+    async def setrolesremove(self, ctx, *, roleName: discord.Role):
+        """Removes an existing role from the list of Event Roles."""
+        await self.removeFromRoleList(ctx, roleName)
+        await ctx.message.add_reaction("✅")
 
     @setroles.command(name="update")
     async def setrolesupdate(self, ctx, *, roleName: discord.Role):
@@ -206,13 +212,6 @@ class wroles(commands.Cog):
     async def setrolesadd(self, ctx, *, roleName: discord.Role):
         """Adds an existing role to the list of Event Roles."""
         await self.addToRoleList(ctx, roleName)
-        await ctx.message.add_reaction("✅")
-        
-    @setroles.command(name="remove")
-    @checks.admin()
-    async def setrolesremove(self, ctx, *, roleName: discord.Role):
-        """Removes an existing role from the list of Event Roles."""
-        await self.removeFromRoleList(ctx, roleName)
         await ctx.message.add_reaction("✅")
         
     @setroles.command(name="reset")
