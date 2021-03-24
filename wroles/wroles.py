@@ -142,9 +142,15 @@ class wroles(commands.Cog):
             else:
                 # Now that we have the role id, we call .get_role() to get the role
                 # and assign it to the user
-                # [TODO] Add a way for it to remove role if you already have it
                 c = ctx.guild.get_role(b)
-                await ctx.author.add_roles(c)
+                if c in ctx.author.roles:
+                    # User already has role, remove it now
+                    await ctx.author.remove_roles(c)
+                    await ctx.message.add_reaction("📤")
+                else:
+                    # User doesn't have role yet, add it now
+                    await ctx.author.add_roles(c)
+                    await ctx.message.add_reaction("📥")
                 await ctx.message.add_reaction("✅")
     
     @commands.guild_only()
