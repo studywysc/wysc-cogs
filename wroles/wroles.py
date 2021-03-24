@@ -114,7 +114,7 @@ class wroles(commands.Cog):
 
     # Bot Commands
 
-    @commands.command(name="roles", aliases=["role", "iam", "am"])
+    @commands.command(name="roles", aliases=["role", "iam", "am", "iamn", "amn", "iamnot", "amnot"])
     async def wroles(self, ctx, *, role=None):
         """List self-assignable Event Roles
         
