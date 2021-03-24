@@ -3,7 +3,7 @@
   "install_msg" : "Wysc cog installed!",
   "name" : "wroles",
   "short" : "A more flexible self-assignable role management system",
-  "requirements" : ["dhooks"],
+  "requirements" : [],
   "description" : "A more flexible self-assignable role management system",
   "permissions" : [],
   "end_user_data_statement" : "This cog does not store any End User Data.",
