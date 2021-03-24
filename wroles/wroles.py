@@ -95,16 +95,30 @@ class wroles(commands.Cog):
         await self.config.guild(ctx.guild).roleList.set(sortRoles)
         await ctx.message.add_reaction("✅")
 
+    async def findRoleFromText(self, ctx, searchtext):
+        """Retrieve a role based on searching text"""
+        # Retrieve role info
+        currentRoles = await self.config.guild(ctx.guild).roleList()
+        # Search for role in currentRoles list
+        for c in currentRoles:
+            # Lowercase everything before searching
+            # Breaking abstraction layer, but it's quicker bc we already have the array items
+            # Array item format: [role.name, role.mention, role.id]
+            if searchtext.lower() in c[0].lower():
+                # Return role id if there is match
+                return c[2]
+            else:
+                pass
+        return False
+
 
     # Bot Commands
 
-    @commands.command(name="roles", aliases=["iam", "am"])
-    async def wroles(self, ctx, *, role: discord.Role=None):
+    @commands.command(name="roles", aliases=["role", "iam", "am"])
+    async def wroles(self, ctx, *, role=None):
         """List self-assignable Event Roles
         
         Add roles using `[p]roles roleYouWantToAddHere`"""
-        # [TODO] Look for way to search for discord role without needing Exact Caps including emoji just to get the role
-
         # Get roles, then make crList which only has the role id's
         currentRoles = await self.config.guild(ctx.guild).roleList()
         
@@ -112,29 +126,26 @@ class wroles(commands.Cog):
             # If there isn't a role specified, build an embed
             # we get the mentions from each role by running roledataMention for each in currentRoles
             # then we add them to a string with "\n" for newline
+            # and then finish by adding a title and footer
             embedList = ""
             for a in currentRoles:
                 b = self.roledataMention(a)
                 embedList += b+"\n"
-            # [TODO] Add title to embed, and a footer that says you can add roles using ",wam"
-            e = discord.Embed(color=(await ctx.embed_colour()), description=embedList)
+            e = discord.Embed(color=(await ctx.embed_colour()), title="Cafe Events Roles", description=embedList)
+            e.set_footer(text="Add a role using `,wrole rolenamehere`")
             await ctx.send(embed=e)
         else:
-            # If there is a role specified, role.id will give us its role id
-            # We build crList with a list of role id's
-            crList = [self.roledataId(r) for r in currentRoles]
-            # If there's a match, we .add_role to them
-            try:
-                b = role.id
-            except:
+            # Call findRoleFromText, which returns role id
+            b = await self.findRoleFromText(ctx, role)
+            if b == False:
                 await ctx.send("Hmmm did you misspell the role? Try just ,wroles to see the roles you can add!")
             else:
-                if b in crList:
-                    # [TODO] Add a way for it to remove role if you already have it
-                    await ctx.author.add_roles(role)
-                    await ctx.message.add_reaction("✅")
-                else:
-                    await ctx.send("Hmmm did you misspell the role? Try just ,wroles to see the roles you can add!")
+                # Now that we have the role id, we call .get_role() to get the role
+                # and assign it to the user
+                # [TODO] Add a way for it to remove role if you already have it
+                c = ctx.guild.get_role(b)
+                await ctx.author.add_roles(c)
+                await ctx.message.add_reaction("✅")
     
     @commands.guild_only()
     @commands.group()
