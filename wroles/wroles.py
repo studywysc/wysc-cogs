@@ -15,8 +15,8 @@ class wroles(commands.Cog):
             "roleMsgs": []
         }
 
-        """ template
-        "rolelist": [ role_id, role_id, ... ],
+        """ concept draft
+        "rolelist": [ [role.name, role.mention, role.id], ... ],
         "rolemsgs": [
             {
                 "name": "name",
@@ -119,7 +119,7 @@ class wroles(commands.Cog):
         """List self-assignable Event Roles
         
         Add roles using `[p]roles roleYouWantToAddHere`"""
-        # Get roles, then make crList which only has the role id's
+        # Get roles
         currentRoles = await self.config.guild(ctx.guild).roleList()
         
         if role == None:
@@ -132,13 +132,13 @@ class wroles(commands.Cog):
                 b = self.roledataMention(a)
                 embedList += b+"\n"
             e = discord.Embed(color=(await ctx.embed_colour()), title="Cafe Events Roles", description=embedList)
-            e.set_footer(text="Add a role using `,wrole rolenamehere`")
+            e.set_footer(text="Add a role using `,iam rolenamehere`")
             await ctx.send(embed=e)
         else:
             # Call findRoleFromText, which returns role id
             b = await self.findRoleFromText(ctx, role)
             if b == False:
-                await ctx.send("Hmmm did you misspell the role? Try just ,wroles to see the roles you can add!")
+                await ctx.send("Hmmm did you misspell the role? Try just ,iam to see the roles you can add!")
             else:
                 # Now that we have the role id, we call .get_role() to get the role
                 # and assign it to the user
@@ -200,7 +200,7 @@ class wroles(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @setroles.command(name="update")
-    async def setrolesupdate(self, ctx, *, roleName: discord.Role):
+    async def setrolesupdate(self, ctx):
         """Updates the role names in the database."""
         await self.updateRoleList(ctx)
         await ctx.message.add_reaction("✅")
