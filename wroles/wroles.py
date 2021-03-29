@@ -93,7 +93,6 @@ class wroles(commands.Cog):
         sortRoles.sort(key=self.roledataName)
         # Commit the changes to guild data
         await self.config.guild(ctx.guild).roleList.set(sortRoles)
-        await ctx.message.add_reaction("✅")
 
     async def findRoleFromText(self, ctx, searchtext):
         """Retrieve a role based on searching text"""
@@ -150,16 +149,25 @@ class wroles(commands.Cog):
                 else:
                     # User doesn't have role yet, add it now
                     await ctx.author.add_roles(c)
-                    await ctx.message.add_reaction("📥")
+                    # Don't add reaction for joining role, it ended up just being confusing....
                 await ctx.message.add_reaction("✅")
     
     @commands.guild_only()
     @commands.group()
     @checks.mod()
     async def setroles(self, ctx: commands.Context):
-        """Role management for Trees and Contributor Hub
-        
-        To list all roles, do `[p]roles`"""
+        """Role management for Trees
+
+        The base commands for this bot are `[p]roles` for users to self-add roles, and `[p]setroles` for Trees to create/manage roles.
+
+        Get started:
+        - Create a new role using `[p]setroles create`
+        - Customize the color afterwards using `[p]setroles editcolor`
+        - List all roles using `[p]roles`
+
+        Aliases:
+        - `,wroles`:  `,wrole`  `,iam`
+        """
         if not ctx.invoked_subcommand:
             pass
 
