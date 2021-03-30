@@ -1,0 +1,11 @@
+{
+  "author" : ["wysc-cogs"],
+  "install_msg" : "Wysc cog installed!",
+  "name" : "wroles",
+  "short" : "Support ticketing/suggestions tracker system using GitHub",
+  "requirements" : ["pygithub"],
+  "description" : "A more flexible support ticketing and suggestions tracker system, using the GitHub API",
+  "permissions" : [],
+  "end_user_data_statement" : "This cog does not store any End User Data.",
+  "tags" : ["support", "tickets", "suggestions", "GitHub"]
+}
