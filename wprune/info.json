@@ -1,0 +1,11 @@
+{
+  "author" : ["wysc-cogs"],
+  "install_msg" : "Wysc cog installed!",
+  "name" : "wprune",
+  "short" : "Prune inactive members",
+  "requirements" : [],
+  "description" : "Prune Level 1 inactive members without affecting Level 2 members and up",
+  "permissions" : [],
+  "end_user_data_statement" : "This cog does not store any End User Data.",
+  "tags" : ["inactive", "prune", "roles"]
+}
