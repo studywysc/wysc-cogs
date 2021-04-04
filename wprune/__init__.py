@@ -1,4 +1,4 @@
-from .wprune import wprune
+from .wprune import Wprune
 
 def setup(bot):
-    bot.add_cog(wprune())
+    bot.add_cog(Wprune())
