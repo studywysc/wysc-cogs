@@ -1,4 +1,4 @@
 from .wsupport import wsupport
 
-def setup(bot):
-    bot.add_cog(wsupport())
+async def setup(bot):
+    await bot.add_cog(wsupport())
